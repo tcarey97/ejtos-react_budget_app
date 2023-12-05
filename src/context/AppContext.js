@@ -30,33 +30,63 @@ export const AppReducer = (state, action) => {
                     ...state
                 }
             }
-            case 'RED_EXPENSE':
-                const red_expenses = state.expenses.map((currentExp)=> {
-                    if (currentExp.name === action.payload.name && currentExp.cost - action.payload.cost >= 0) {
-                        currentExp.cost =  currentExp.cost - action.payload.cost;
-                        budget = state.budget + action.payload.cost
+        case 'REDUCE_EXPENSE':
+            let total_budget_reduce = 0;
+            total_budget_reduce = state.expenses.reduce(
+                (previousExp, currentExp) => {
+                    return previousExp + currentExp.cost
+                },0
+            );
+            total_budget_reduce = total_budget_reduce - action.payload.cost;
+            action.type = "DONE";
+            if(total_budget_reduce >= 0) {
+                state.expenses.map((currentExp)=> {
+                    if(currentExp.name === action.payload.name) {
+                        if (currentExp.cost - action.payload.cost < 0){
+                            alert("Cannot reduce allocation less than 0");
+                        } else {
+                            currentExp.cost = currentExp.cost - action.payload.cost;
+                        }
+                        
                     }
                     return currentExp
-                })
-                action.type = "DONE";
+                });
                 return {
                     ...state,
-                    expenses: [...red_expenses],
                 };
-            case 'DELETE_EXPENSE':
-            action.type = "DONE";
-            state.expenses.map((currentExp)=> {
-                if (currentExp.name === action.payload) {
-                    budget = state.budget + currentExp.cost
-                    currentExp.cost =  0;
+            } else {
+                alert("Cannot decrease the allocation! Budget cannot be lower than 0");
+                return {
+                    ...state
+                }
+            }
+        case 'RED_EXPENSE':
+            const red_expenses = state.expenses.map((currentExp)=> {
+                if (currentExp.name === action.payload.name && currentExp.cost - action.payload.cost >= 0) {
+                    currentExp.cost =  currentExp.cost - action.payload.cost;
+                    budget = state.budget + action.payload.cost
                 }
                 return currentExp
             })
             action.type = "DONE";
             return {
                 ...state,
-                budget
+                expenses: [...red_expenses],
             };
+        case 'DELETE_EXPENSE':
+        action.type = "DONE";
+        state.expenses.map((currentExp)=> {
+            if (currentExp.name === action.payload) {
+                budget = state.budget + currentExp.cost
+                currentExp.cost =  0;
+            }
+            return currentExp
+        })
+        action.type = "DONE";
+        return {
+            ...state,
+            budget
+        };
         case 'SET_BUDGET':
             action.type = "DONE";
             state.budget = action.payload;
