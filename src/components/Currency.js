@@ -1,24 +1,23 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 
 const Currency = () =>{
 
-    const { currency } = useContext(AppContext);
-    const [currentCurrency, setNewCurrency] = useState(currency);
+    const { dispatch, currency } = useContext(AppContext);
 
-    console.log(currency);
-
-    const changeCurrency = (event) => {
-        setNewCurrency(event.target.value);
+    const changeCurrency = (new_currency) => {
+        dispatch({
+            type: 'CHG_CURRENCY',
+            payload: new_currency,
+        });
     }
     return (
-        <div class="dropdown">
-            <button onChange={changeCurrency} class="dropbtn">Currency {currentCurrency}</button>
-            <div id="myDropdown" class="dropdown-content">
-                <a href="#">$ Dollar</a>
-                <a href="#">£ Pound</a>
-            </div>
-        </div>
+        <DropdownButton onSelect={changeCurrency} id="dropdown-basic-button" title={"Currency " + currency}>
+            <Dropdown.Item eventKey="£">£ Pound</Dropdown.Item>
+            <Dropdown.Item eventKey="$">$ Dollar</Dropdown.Item>
+        </DropdownButton>
     );
 };
 
